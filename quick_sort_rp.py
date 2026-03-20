@@ -1,27 +1,32 @@
 import time
-import random
 import sys
+import random
 
 sys.setrecursionlimit(200000)
 
-def _partition_rp(arr, low, high):
-    rand_idx = random.randint(low, high)
-    arr[low], arr[rand_idx] = arr[rand_idx], arr[low]
+def _partition_rp(arr, p, r):
+    x = arr[random.randint(p, r)]
+    i = p - 1
+    j = r + 1
     
-    pivot = arr[low]
-    i = low + 1
-    for j in range(low + 1, high + 1):
-        if arr[j] <= pivot:
-            arr[i], arr[j] = arr[j], arr[i]
+    while True:
+        i += 1
+        while arr[i] < x:
             i += 1
-    arr[low], arr[i - 1] = arr[i - 1], arr[low]
-    return i - 1
+            
+        j -= 1
+        while arr[j] > x:
+            j -= 1
+            
+        if i >= j:
+            return j
+        arr[i], arr[j] = arr[j], arr[i]
 
-def _quick_sort_rp_recursive(arr, low, high):
-    if low < high:
-        pi = _partition_rp(arr, low, high)
-        _quick_sort_rp_recursive(arr, low, pi - 1)
-        _quick_sort_rp_recursive(arr, pi + 1, high)
+def _quick_sort_rp_recursive(arr, p, r):
+    if p < r:
+        q = _partition_rp(arr, p, r)
+        _quick_sort_rp_recursive(arr, p, q)
+        _quick_sort_rp_recursive(arr, q + 1, r)
 
 def quick_sort_random_pivot(data):
     arr = data.copy()

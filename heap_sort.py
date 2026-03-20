@@ -21,11 +21,9 @@ def heap_sort(data):
     
     start_time = time.perf_counter()
     
-    # Budowanie kopca
     for i in range(n // 2 - 1, -1, -1):
         _heapify(arr, n, i)
 
-    # Wyciąganie elementów
     for i in range(n - 1, 0, -1):
         arr[i], arr[0] = arr[0], arr[i]
         _heapify(arr, i, 0)

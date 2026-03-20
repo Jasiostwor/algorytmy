@@ -1,24 +1,31 @@
 import time
 import sys
 
-# Zwiększony limit dla dużych wartości N podawanych z okienka
 sys.setrecursionlimit(200000)
 
-def _partition_lp(arr, low, high):
-    pivot = arr[low]
-    i = low + 1
-    for j in range(low + 1, high + 1):
-        if arr[j] <= pivot:
-            arr[i], arr[j] = arr[j], arr[i]
+def _partition_lp(arr, p, r):
+    x = arr[p]
+    i = p - 1
+    j = r + 1
+    
+    while True:
+        i += 1
+        while arr[i] < x:
             i += 1
-    arr[low], arr[i - 1] = arr[i - 1], arr[low]
-    return i - 1
+            
+        j -= 1
+        while arr[j] > x:
+            j -= 1
+            
+        if i >= j:
+            return j
+        arr[i], arr[j] = arr[j], arr[i]
 
-def _quick_sort_lp_recursive(arr, low, high):
-    if low < high:
-        pi = _partition_lp(arr, low, high)
-        _quick_sort_lp_recursive(arr, low, pi - 1)
-        _quick_sort_lp_recursive(arr, pi + 1, high)
+def _quick_sort_lp_recursive(arr, p, r):
+    if p < r:
+        q = _partition_lp(arr, p, r)
+        _quick_sort_lp_recursive(arr, p, q)
+        _quick_sort_lp_recursive(arr, q + 1, r)
 
 def quick_sort_left_pivot(data):
     arr = data.copy()
