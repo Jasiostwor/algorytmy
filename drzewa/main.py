@@ -119,8 +119,8 @@ class TreeApp:
 
     def construct_trees(self):
         self.log("\n--- Budowanie drzew ---")
-        self.avl_root, tmp= create_avl(self.current_data.copy())
-        self.log("Stworzono drzewo AVL (metodą połowienia binarnego)."+ str(tmp))
+        self.avl_root, tmp = create_avl(self.current_data.copy())
+        self.log("Stworzono drzewo AVL (metodą połowienia binarnego). Wysokość AVL: " + str(tmp))
         
         self.bst_root = build_degenerate_bst(self.current_data)
         self.log("Stworzono zdegenerowane drzewo BST.")
