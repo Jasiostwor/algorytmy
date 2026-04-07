@@ -1,9 +1,10 @@
 import tkinter as tk
 from tkinter import messagebox
+import statistics
 
 from test_data import DataGenerator
 
-# Import algorytmów (musisz je dostosować do nowego formatu - instrukcja poniżej)
+# Import algorytmów
 from insertion_sort import insertion_sort
 from shell_sort import shell_sort
 from selection_sort import selection_sort
@@ -16,6 +17,9 @@ class SortingTesterApp:
         self.root = root
         self.root.title("Tester Algorytmów Sortowania")
         self.root.geometry("600x750")
+
+        # Zmienna do przechowywania nazwy aktualnie wczytanego zestawu danych
+        self.current_dataset_name = "Własne / Ręczne"
 
         self.create_widgets()
 
@@ -41,6 +45,8 @@ class SortingTesterApp:
         tk.Label(self.root, text="Dane wejściowe:", font=("Arial", 10, "bold")).pack(pady=(10, 0))
         self.input_text = tk.Text(self.root, height=5, width=70)
         self.input_text.pack(pady=5)
+        # Bindowanie zdarzenia edycji tekstu, by zresetować nazwę zestawu, jeśli użytkownik wpisze coś z palca
+        self.input_text.bind("<Key>", self.on_text_modified)
 
         # --- SEKCJA: WYBÓR ALGORYTMU ---
         tk.Label(self.root, text="Wybierz algorytm do testu:", font=("Arial", 10, "bold")).pack(pady=(15, 0))
@@ -60,12 +66,16 @@ class SortingTesterApp:
         self.output_text.pack(pady=5)
 
         # --- SEKCJA: CZAS WYKONANIA ---
-        tk.Label(self.root, text="Czas wykonania:", font=("Arial", 10, "bold")).pack(pady=(10, 0))
-        self.time_text = tk.Text(self.root, height=2, width=70, state=tk.DISABLED, bg="#202020", fg="#00FF00", font=("Arial", 12, "bold"))
+        tk.Label(self.root, text="Wynik testu (5 prób):", font=("Arial", 10, "bold")).pack(pady=(10, 0))
+        self.time_text = tk.Text(self.root, height=2, width=70, state=tk.DISABLED, bg="#202020", fg="#00FF00", font=("Arial", 10, "bold"))
         self.time_text.pack(pady=5)
 
+    def on_text_modified(self, event):
+        """Jeśli użytkownik sam zmienia dane w polu tekstowym, zmieniamy typ na własny."""
+        self.current_dataset_name = "Własne / Ręczne"
+
     def load_data(self, dataset_type):
-        """Pobiera N z pola, generuje dane i wrzuca je do okna."""
+        """Pobiera N z pola, generuje dane, przypisuje nazwę zestawu i wrzuca je do okna."""
         try:
             n = int(self.n_entry.get().strip())
             if n <= 0:
@@ -74,21 +84,25 @@ class SortingTesterApp:
             messagebox.showerror("Błąd", "Podaj poprawną, dodatnią liczbę całkowitą w polu 'n'.")
             return
 
-        # Zabezpieczenie przed zawieszeniem interfejsu przy ogromnych liczbach
         if n > 15000:
             messagebox.showwarning("Uwaga", "Dla n > 15000 interfejs graficzny może chwilę 'zamyślić się' przy wyświetlaniu danych w polu tekstowym.")
 
         data = []
         if dataset_type == "random":
             data = DataGenerator.get_random(n)
+            self.current_dataset_name = "Losowe"
         elif dataset_type == "ascending":
             data = DataGenerator.get_ascending(n)
+            self.current_dataset_name = "Rosnące"
         elif dataset_type == "descending":
             data = DataGenerator.get_descending(n)
+            self.current_dataset_name = "Malejące"
         elif dataset_type == "constant":
             data = DataGenerator.get_constant(n)
+            self.current_dataset_name = "Stałe"
         elif dataset_type == "a_shaped":
             data = DataGenerator.get_a_shaped(n)
+            self.current_dataset_name = "A-kształtne"
 
         self.input_text.delete(1.0, tk.END)
         self.input_text.insert(tk.END, " ".join(map(str, data)))
@@ -108,31 +122,48 @@ class SortingTesterApp:
             return
 
         sorted_result = []
-        time_taken = 0.0
+        times_taken = []
+        
+        # Mapowanie skróconej nazwy do wyświetlanej pełnej nazwy
+        algo_display_names = {
+            "insertion": "Insertion Sort",
+            "shell": "Shell Sort",
+            "selection": "Selection Sort",
+            "heap": "Heap Sort",
+            "qsl": "Quick Sort (Left Pivot)",
+            "qsr": "Quick Sort (Random Pivot)"
+        }
+        display_algo = algo_display_names.get(algo_name, "Nieznany")
 
         try:
-            # Algorytmy teraz zwracają tylko krotkę: (posortowana_tablica, calkowity_czas)
-            if algo_name == "insertion":
-                sorted_result, time_taken = insertion_sort(original_data)
-            elif algo_name == "shell":
-                sorted_result, time_taken = shell_sort(original_data)
-            elif algo_name == "selection":
-                sorted_result, time_taken = selection_sort(original_data)
-            elif algo_name == "heap":
-                sorted_result, time_taken = heap_sort(original_data)
-            elif algo_name == "qsl":
-                sorted_result, time_taken = quick_sort_left_pivot(original_data)
-            elif algo_name == "qsr":
-                sorted_result, time_taken = quick_sort_random_pivot(original_data)
+            # Pętla wykonująca algorytm 5 razy
+            for _ in range(5):
+                if algo_name == "insertion":
+                    sorted_result, time_taken = insertion_sort(original_data)
+                elif algo_name == "shell":
+                    sorted_result, time_taken = shell_sort(original_data)
+                elif algo_name == "selection":
+                    sorted_result, time_taken = selection_sort(original_data)
+                elif algo_name == "heap":
+                    sorted_result, time_taken = heap_sort(original_data)
+                elif algo_name == "qsl":
+                    sorted_result, time_taken = quick_sort_left_pivot(original_data)
+                elif algo_name == "qsr":
+                    sorted_result, time_taken = quick_sort_random_pivot(original_data)
                 
-            self.display_results(sorted_result, time_taken)
+                times_taken.append(time_taken)
+                
+            self.display_results(sorted_result, times_taken, display_algo, self.current_dataset_name)
             
         except RecursionError:
-            messagebox.showerror("Błąd rekurencji", "Przekroczono limit rekurencji dla tego algorytmu i zestawu danych.")
+            messagebox.showerror("Błąd rekurencji", f"Przekroczono limit rekurencji dla algorytmu {display_algo} i obecnego zestawu danych.")
         except Exception as e:
             messagebox.showerror("Błąd", f"Wystąpił błąd podczas sortowania: {e}")
 
-    def display_results(self, sorted_data, time_taken):
+    def display_results(self, sorted_data, times_taken, algo_name, dataset_name):
+        mean_time = statistics.mean(times_taken)
+        std_dev = statistics.stdev(times_taken) if len(times_taken) > 1 else 0.0
+
         self.output_text.config(state=tk.NORMAL)
         self.output_text.delete(1.0, tk.END)
         self.output_text.insert(tk.END, " ".join(map(str, sorted_data)))
@@ -140,7 +171,9 @@ class SortingTesterApp:
 
         self.time_text.config(state=tk.NORMAL)
         self.time_text.delete(1.0, tk.END)
-        self.time_text.insert(tk.END, f" {time_taken:.6f} sekund")
+        # Konstruowanie sformatowanego łańcucha znaków z wynikami
+        result_text = f"[{algo_name} | Dane: {dataset_name}]\nŚr. czas: {mean_time:.6f} s  |  Odchylenie (σ): {std_dev:.6f} s"
+        self.time_text.insert(tk.END, result_text)
         self.time_text.config(state=tk.DISABLED)
 
 if __name__ == "__main__":
