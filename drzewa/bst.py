@@ -1,17 +1,57 @@
 from node import Node
 
-# Do zmiany, kAmien zrob jak na zajeciach bo to gemini generated
-def insert_bst(root, value):
-    if root is None:
-        return Node(value)
-    if value < root.value:
-        root.left = insert_bst(root.left, value)
-    elif value > root.value:
-        root.right = insert_bst(root.right, value)
-    return root
+class Node:
+    def __init__(self, value):
+        # Wartosc przechowywana w wezle
+        self.value = value
+        # Lewy syn
+        self.left = None
+        # Prawy syn
+        self.right = None
 
-def build_degenerate_bst(tab):
-    root = None
-    for val in tab:
-        root = insert_bst(root, val)
-    return root
+
+# Rekurencyjne przeszukiwanie drzewa inorderem lkp
+def search(node):
+    if node.left is not None:
+        search(node.left)
+    print(node.value, end=" ")
+    if node.right is not None:
+        search(node.right)
+#klp
+def preorder(node):
+    print(node.value, end =" ")
+    if node.left is not None:
+        preorder(node.left)
+    if node.right is not None:
+        preorder(node.right)
+
+def insert(node, value):
+    if value > node.value:
+        if node.right is None:
+            node.right = Node(value)
+        else:
+            insert(node.right, value)
+    elif value < node.value:
+        if node.left is None:
+            node.left = Node(value)
+        else:
+            insert(node.left, value)
+
+numbers = [5,3,4,6,7,8,2,1]
+
+
+# Korzen drzewa
+root = Node(numbers[0])
+# Dodajemy dzieci "recznie"
+#root.left = Node(4)
+#root.right = Node(9)
+#root.left.right = Node(5)
+for number in numbers[1:]:
+    insert(root, number)
+
+# Przeszukujemy drzewo w kolejnosci in-order
+print("in-order")
+(search(root))
+print("\n")
+print("preorder")
+(preorder(root))
