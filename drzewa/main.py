@@ -122,8 +122,8 @@ class TreeApp:
         self.avl_root, tmp = create_avl(self.current_data.copy())
         self.log("Stworzono drzewo AVL (metodą połowienia binarnego). Wysokość AVL: " + str(tmp))
         
-        self.bst_root = build_degenerate_bst(self.current_data)
-        self.log("Stworzono zdegenerowane drzewo BST.")
+        self.bst_root, self.bst_height = build_degenerate_bst(self.current_data)
+        self.log(f"Drzewo BST (zdegenerowane) gotowe. Wysokość: {self.bst_height}")
 
     def find_min_max(self):
         if not self.avl_root or not self.bst_root:
@@ -276,9 +276,11 @@ class TreeApp:
 
     def balance_dsw(self):
         if not self.bst_root: return
+        from bst import get_height_after
         self.log("\n--- Równoważenie algorytmem DSW (Drzewo zdegenerowane) ---")
         self.bst_root = dsw_balance(self.bst_root)
-        self.log("Drzewo zrównoważone pomyślnie.")
+        self.bst_height = get_height_after(self.bst_root)
+        self.log(f"Drzewo zrównoważone pomyślnie. Nowa wysokość: {self.bst_height}")
 
     def run_tests(self):
         self.clear_log()
