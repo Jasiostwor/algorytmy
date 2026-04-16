@@ -1,9 +1,9 @@
 import tkinter as tk
-from tkinter import messagebox, scrolledtext, Canvas, Toplevel # NOWY IMPORT
+from tkinter import messagebox, scrolledtext, Canvas, Toplevel 
 import random
 import time
 import sys
-import math # NOWY IMPORT
+import math 
 
 from node import Node
 from avl import create_avl
@@ -33,8 +33,7 @@ class TreeApp:
     def setup_ui(self):
         control_frame = tk.Frame(self.root, width=350, padx=10, pady=10)
         control_frame.pack(side=tk.LEFT, fill=tk.Y)
-        
-        # 1. Dane wejściowe
+
         tk.Label(control_frame, text="Dane wejściowe (n <= 1000)", font=("Arial", 10, "bold")).pack(anchor=tk.W, pady=(0, 5))
         tk.Label(control_frame, text="Podaj liczby (np. 1, 3, 5):").pack(anchor=tk.W)
         self.manual_input = tk.Entry(control_frame, width=30)
@@ -48,13 +47,12 @@ class TreeApp:
         tk.Button(control_frame, text="Generuj i Zbuduj", command=self.build_from_generator).pack(fill=tk.X, pady=(0, 10))
         
         tk.Frame(control_frame, height=2, bd=1, relief=tk.SUNKEN).pack(fill=tk.X, pady=10)
-        
-        # 2. Operacje
+  
         tk.Label(control_frame, text="Operacje na drzewach", font=("Arial", 10, "bold")).pack(anchor=tk.W, pady=(0, 5))
         tk.Button(control_frame, text="1. Min/Max i ścieżka", command=self.find_min_max).pack(fill=tk.X, pady=2)
         tk.Button(control_frame, text="2. Wypisz In-order i Pre-order", command=self.print_orders).pack(fill=tk.X, pady=2)
         
-        # NOWE PRZYCISKI:
+   
         tk.Button(control_frame, text="2.5. Pokaż strukturę drzew (ASCII - Konsola)", command=self.show_trees_ascii).pack(fill=tk.X, pady=2)
         tk.Button(control_frame, text="2.6. Pokaż strukturę drzew (GRAFICZNA - Nowe okno)", bg="lightgreen", command=self.show_trees_graph).pack(fill=tk.X, pady=2)
         
@@ -70,16 +68,15 @@ class TreeApp:
 
         tk.Frame(control_frame, height=2, bd=1, relief=tk.SUNKEN).pack(fill=tk.X, pady=10)
 
-        # 3. Testy
+       
         tk.Label(control_frame, text="Pomiary i testy", font=("Arial", 10, "bold")).pack(anchor=tk.W, pady=(0, 5))
         tk.Button(control_frame, text="Uruchom testy wydajnościowe", bg="lightblue", command=self.run_tests).pack(fill=tk.X)
 
-        # 4. Konsola
+       
         output_frame = tk.Frame(self.root, padx=10, pady=10)
         output_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
         tk.Label(output_frame, text="Wyniki operacji:", font=("Arial", 10, "bold")).pack(anchor=tk.W)
-        
-        # WAŻNE: Tu ustawiamy monospaced font dla konsoli w GUI
+
         self.console = scrolledtext.ScrolledText(output_frame, wrap=tk.NONE, font=("Consolas", 10))
         self.console.pack(fill=tk.BOTH, expand=True)
 
@@ -166,8 +163,7 @@ class TreeApp:
         self.log("\n" + "="*50)
         self.log("STRUKTURA DRZEW (ASCII - Konsola, monospaced font)")
         self.log("="*50)
-        
-        # Blokada dla n > 50 dla konsoli, żeby jej nie zapchać
+
         if len(self.current_data) > 50:
              messagebox.showinfo("Informacja", "Dla n > 50 ASCII w konsoli jest nieczytelny. Polecam widok graficzny.")
              return
@@ -189,18 +185,16 @@ class TreeApp:
         if not self.avl_root and not self.bst_root:
             messagebox.showwarning("Uwaga", "Brak drzew.")
             return
-            
-        # Blokada dla n > 200 dla grafiki, żeby uniknąć zacięcia
+
         if len(self.current_data) > 200:
              messagebox.showinfo("Informacja", "Graficzny widok wyłączony dla n > 200 dla zachowania płynności.")
              return
 
-        # Tworzymy nowe okno
+  
         tree_window = Toplevel(self.root)
         tree_window.title("Graficzna struktura drzew")
         tree_window.geometry("1000x800")
-        
-        # Kanwa do rysowania
+
         canvas = Canvas(tree_window, bg="white")
         canvas.pack(fill=tk.BOTH, expand=True)
         
@@ -227,30 +221,25 @@ class TreeApp:
         if self.bst_root:
              self.log("--- Rysowanie widoku graficznego (BST) ---")
              tk.Label(canvas, text="DRZEWO BST (zdegenerowane/DSW)", font=("Arial", 12, "bold"), bg="white", fg="red").pack(pady=10)
-             # Rysujemy niżej
+
              offset_y = 600
              self._draw_node(canvas, self.bst_root, x=frame_width//2, y=offset_y, dx=frame_width//4, color="salmon")
 
     def _draw_node(self, canvas, node, x, y, dx, color, level=1):
-        """Pomocnicza funkcja rysująca węzeł i jego dzieci graficznie."""
         if node is None: return
         
-        r = 20 # promień koła
+        r = 20 
         
-        # Prawa linia (idzie do góry w widoku graficznym) -> Nie, to jest top-down view.
-        # Prawa strona graficznie rysowana na prawo
         if node.right:
              line_color = "gray"
              canvas.create_line(x, y, x + dx, y + 100, fill=line_color, width=2)
              self._draw_node(canvas, node.right, x + dx, y + 100, dx//2, color, level+1)
         
-        # Lewa linia graficznie rysowana na lewo
         if node.left:
              line_color = "gray"
              canvas.create_line(x, y, x - dx, y + 100, fill=line_color, width=2)
              self._draw_node(canvas, node.left, x - dx, y + 100, dx//2, color, level+1)
-             
-        # Sam węzeł (kółko) - rysujemy na wierzchu linii
+
         canvas.create_oval(x-r, y-r, x+r, y+r, fill=color, outline="black", width=2)
         canvas.create_text(x, y, text=str(node.value), font=("Arial", 10, "bold"), fill="black")
 
