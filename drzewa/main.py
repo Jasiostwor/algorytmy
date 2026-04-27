@@ -54,7 +54,7 @@ class TreeApp:
         
    
         tk.Button(control_frame, text="2.5. Pokaż strukturę drzew (ASCII - Konsola)", command=self.show_trees_ascii).pack(fill=tk.X, pady=2)
-        tk.Button(control_frame, text="2.6. Pokaż strukturę drzew (GRAFICZNA - Nowe okno)", bg="lightgreen", command=self.show_trees_graph).pack(fill=tk.X, pady=2)
+        # tk.Button(control_frame, text="2.6. Pokaż strukturę drzew (GRAFICZNA - Nowe okno)", bg="lightgreen", command=self.show_trees_graph).pack(fill=tk.X, pady=2)
         
         tk.Button(control_frame, text="3. Usuń całe drzewo (Post-order)", command=self.delete_whole_trees).pack(fill=tk.X, pady=2)
         tk.Button(control_frame, text="4. Równoważenie BST (DSW)", command=self.balance_dsw).pack(fill=tk.X, pady=2)

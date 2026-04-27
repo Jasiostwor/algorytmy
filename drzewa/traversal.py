@@ -1,4 +1,5 @@
 def get_inorder(node, result):
+    # Kolejność: lewy, korzeń, prawy
     if node.left is not None:
         get_inorder(node.left, result)
     result.append(str(node.value))
@@ -7,6 +8,7 @@ def get_inorder(node, result):
     
 
 def get_preorder(node, result):
+    # Kolejność: korzeń, lewy, prawy
     result.append(str(node.value))
     if node.left is not None:
         get_preorder(node.left, result)

@@ -1,5 +1,30 @@
 import math
-from node import Node
+from node import Node 
+
+def rotate_right(parent, node):
+    left_child = node.left
+    node.left = left_child.right
+    left_child.right = node
+    parent.right = left_child
+    return left_child
+
+def rotate_left(parent, node):
+    right_child = node.right
+    node.right = right_child.left
+    right_child.left = node
+    parent.right = right_child
+    return right_child
+
+def compress(dummy_root, times):
+    parent = dummy_root
+    curr = dummy_root.right
+    for _ in range(times):
+        if not curr or not curr.right:
+            break
+        rotate_left(parent, curr)
+        parent = parent.right
+        curr = parent.right
+
 
 def dsw_balance(root):
     if not root:
@@ -14,36 +39,21 @@ def dsw_balance(root):
 
     while curr:
         if curr.left:
-            left_child = curr.left
-            curr.left = left_child.right
-            left_child.right = curr
-            parent.right = left_child
-            curr = left_child
+            curr = rotate_right(parent, curr)
         else:
             count += 1
             parent = curr
             curr = curr.right
 
-    h = int(math.log2(count + 1))
-    m = 2**h - 1
+    height = int(math.log2(count + 1))
+    perfect_tree_size = (2 ** height) - 1 
+    
+    leaves_to_compress = count - perfect_tree_size
 
-    _compress(dummy, count - m)
+    compress(dummy, leaves_to_compress)
 
-    while m > 1:
-        m //= 2
-        _compress(dummy, m)
+    while perfect_tree_size > 1:
+        perfect_tree_size //= 2
+        compress(dummy, perfect_tree_size)
 
     return dummy.right
-
-def _compress(parent, n):
-    curr = parent.right
-    for _ in range(n):
-        if not curr or not curr.right:
-            break
-        child = curr.right
-        curr.right = child.left
-        child.left = curr
-        parent.right = child
-        
-        parent = child
-        curr = parent.right
